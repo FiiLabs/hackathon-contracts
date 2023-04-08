@@ -3,7 +3,7 @@ require("@nomicfoundation/hardhat-toolbox");
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
 
-  defaultNetwork: "hardhat",
+  defaultNetwork: "AltLayer",
   solidity: {
       compilers: [
           {
@@ -22,14 +22,14 @@ module.exports = {
       initialDate:'01 Jan 1970 00:00:00 GMT',
     },
     local: {
-        url: 'http://127.0.0.1:8545',
+        url: 'http:127.0.0.1:8545',
         chainId: 111,
         accounts: [
         ]
     },
-    polygontest: {
-      url: 'https://rpc-mumbai.maticvigil.com/',
-      chainId: 80001,
+    AltLayer: {
+      url: 'https://devnet-rpc.altlayer.io/',
+      chainId: 9990,
       accounts: [
       ]
     },

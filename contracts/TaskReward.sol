@@ -131,8 +131,7 @@ contract TaskReward is Ownable{
 
         if(task.publisher == msg.sender) {
             Job storage job = task.jobs[jid];
-            // if( (job.status != JobStatus.ACCEPTED) && (job.status != JobStatus.REJECTED) ) {
-                //don`t verify when mvp
+            if( (job.status != JobStatus.ACCEPTED) && (job.status != JobStatus.REJECTED) ) {
                 job.id = jid;
                 job.status = JobStatus.ACCEPTED;
                 job.marker = marker;
@@ -151,7 +150,7 @@ contract TaskReward is Ownable{
                         task.vreward,
                         task.freward
                     );
-            // }
+            }
         }
     }
     
@@ -165,8 +164,7 @@ contract TaskReward is Ownable{
             if( (jcount == mcount) && (mcount == vcount) && (mcount == fcount)) {
                 for (uint256 i = 0; i < jcount; i++) {
                     Job storage job = task.jobs[jid[i]];
-                    // if( (job.status != JobStatus.ACCEPTED) && (job.status != JobStatus.REJECTED) ) {
-                    // don`t verify when mvp
+                    if( (job.status != JobStatus.ACCEPTED) && (job.status != JobStatus.REJECTED) ) {
                         job.id = jid[i];
                         job.status = JobStatus.ACCEPTED;
                         job.marker = marker[i];
@@ -185,69 +183,71 @@ contract TaskReward is Ownable{
                             task.vreward,
                             task.freward
                         );
-                    // }
+                    }
                 }
             }
         }
     }
-    // function rejectJob(uint256 tid, uint256 jid,address marker,address validator) external {
-    //     Task storage task = tasks[tid];
-    //     if(task.publisher == msg.sender) {
-    //         Job storage job = task.jobs[jid];
-    //         // if( (job.status != JobStatus.ACCEPTED) && (job.status != JobStatus.REJECTED) ) {
-    //         //don`t verify when mvp
-    //             job.id = jid;
-    //             job.status = JobStatus.REJECTED;
-    //             job.marker = marker;
-    //             job.validator = validator;
-    //             if(msg.sender != validator) {
-    //                 IERC20(rewardToken).transfer(validator,task.vreward);
-    //             }
-    //             emit RejectTask(
-    //                     tid,
-    //                     jid,
-    //                     msg.sender,
-    //                     marker,
-    //                     validator,
-    //                     task.mreward,
-    //                     task.vreward
-    //                 );
-    //         // }
-    //     }
-    // }
+    function rejectJob(uint256 tid, uint256 jid,address marker,address validator, address fisher) external {
+        Task storage task = tasks[tid];
+        if(task.publisher == msg.sender) {
+            Job storage job = task.jobs[jid];
+            if( (job.status != JobStatus.ACCEPTED) && (job.status != JobStatus.REJECTED) ) {
+                job.id = jid;
+                job.status = JobStatus.REJECTED;
+                job.marker = marker;
+                job.validator = validator;
+                if(msg.sender != validator) {
+                    IERC20(rewardToken).transfer(validator,task.vreward);
+                }
+                emit RejectTask(
+                        tid,
+                        jid,
+                        msg.sender,
+                        marker,
+                        validator,
+                        fisher,
+                        task.mreward,
+                        task.vreward,
+                        task.freward
+                    );
+             }
+        }
+    }
 
-    // function rejectJobs(uint256 tid, uint256[] memory  jid,address[] memory marker,address[] memory validator) external {
-    //     Task storage task = tasks[tid];
-    //     if(task.publisher == msg.sender) {
-    //         uint256 jcount = jid.length;
-    //         uint256 mcount = marker.length;
-    //         uint256 vcount = marker.length;
-    //         if( (jcount == mcount) && (mcount == vcount) ) {
-    //             for (uint256 i = 0; i < jcount; i++) {
-    //                 Job storage job = task.jobs[jid[i]];
-    //                 // if( (job.status != JobStatus.ACCEPTED) && (job.status != JobStatus.REJECTED) ) {
-    //                     //don`t verify when mvp
-    //                     job.id = jid[i];
-    //                     job.status = JobStatus.REJECTED;
-    //                     job.marker = marker[i];
-    //                     job.validator = validator[i];
-    //                     if(msg.sender != validator[i]) {
-    //                         IERC20(rewardToken).transfer(validator[i],task.vreward);
-    //                     }
-    //                     emit RejectTask(
-    //                         tid,
-    //                         jid[i],
-    //                         msg.sender,
-    //                         marker[i],
-    //                         validator[i],
-    //                         task.mreward,
-    //                         task.vreward
-    //                     );
-    //                 // }
-    //             }
-    //         }
-    //     }
-    // }
+    function rejectJobs(uint256 tid, uint256[] memory  jid,address[] memory marker,address[] memory validator, address[] memory fisher) external {
+        Task storage task = tasks[tid];
+        if(task.publisher == msg.sender) {
+            uint256 jcount = jid.length;
+            uint256 mcount = marker.length;
+            uint256 vcount = marker.length;
+            if( (jcount == mcount) && (mcount == vcount) ) {
+                for (uint256 i = 0; i < jcount; i++) {
+                    Job storage job = task.jobs[jid[i]];
+                    if( (job.status != JobStatus.ACCEPTED) && (job.status != JobStatus.REJECTED) ) {
+                        job.id = jid[i];
+                        job.status = JobStatus.REJECTED;
+                        job.marker = marker[i];
+                        job.validator = validator[i];
+                        if(msg.sender != validator[i]) {
+                            IERC20(rewardToken).transfer(validator[i],task.vreward);
+                        }
+                        emit RejectTask(
+                            tid,
+                            jid[i],
+                            msg.sender,
+                            marker[i],
+                            validator[i],
+                            fisher[i],
+                            task.mreward,
+                            task.vreward,
+                            task.freward
+                        );
+                    }
+                }
+            }
+        }
+    }
 
     function withdraw(uint256 _amount,address _to) external onlyOwner{
         IERC20(rewardToken).transfer(_to,_amount);
